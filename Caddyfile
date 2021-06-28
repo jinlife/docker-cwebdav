@@ -1,0 +1,21 @@
+{
+  email glucose1e@tom.com # email for ACME
+  order webdav before file_server # Important, webdav plugin should be ordered before file_server
+}
+
+:80 {
+  encode zstd gzip # optional compression
+  basicauth { # optional auth
+    {$USERNAME} {$PASSWORD}
+  }
+   webdav {
+    root {$SCOPE}
+  }
+}
+
+https://{$DOMAIN}:443 {
+  encode zstd gzip # optional compression
+  reverse_proxy  localhost:80 {
+        header_up Host {http.reverse_proxy.upstream.hostport}
+	}
+}
