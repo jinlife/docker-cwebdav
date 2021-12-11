@@ -13,10 +13,10 @@ RUN echo 'package main' > caddy.go && \
 RUN go env -w GOPROXY="https://goproxy.io,direct" && \
     CGO_ENABLED=0 go build -trimpath -tags netgo -ldflags '-extldflags "-static" -s -w' -o /usr/bin/caddy .
 
-FROM caddy:2.4.6-builder AS builder2
+FROM winamd64/caddy:2.4.6-builder AS builder2
 WORKDIR /src
-RUN export GOARCH=386 GOOS=windows 
-RUN xcaddy build v2.4.6 \
+RUN export GOARCH=amd64 GOOS=windows 
+RUN xcaddy build \
     --with github.com/abiosoft/caddy-exec \
     --with github.com/imgk/caddy-trojan \
     --with github.com/RussellLuo/caddy-ext/ratelimit \
