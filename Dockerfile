@@ -13,12 +13,24 @@ RUN echo 'package main' > caddy.go && \
 RUN go env -w GOPROXY="https://goproxy.io,direct" && \
     CGO_ENABLED=0 go build -trimpath -tags netgo -ldflags '-extldflags "-static" -s -w' -o /usr/bin/caddy .
 
-
+FROM golang:1.15 AS builder2
+WORKDIR /src
+RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@master
+export GOARCH=386 GOOS=windows 
+xcaddy build v2.4.6 \
+    --with github.com/abiosoft/caddy-exec \
+    --with github.com/imgk/caddy-trojan \
+    --with github.com/RussellLuo/caddy-ext/ratelimit \
+    --with github.com/caddy-dns/cloudflare \
+    --output /usr/bin/caddy.exe
+	
 
 FROM alpine:3.13
 
 LABEL maintainer "jinlife <glucose1e@tom.com>"
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+COPY --from=builder2 /usr/bin/caddy.exe /usr/bin/caddy.exe
+
 RUN chmod +x /usr/bin/caddy && /usr/bin/caddy version
 
 ARG MKCERT_VERSION="1.4.3"
