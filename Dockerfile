@@ -16,8 +16,8 @@ RUN go env -w GOPROXY="https://goproxy.io,direct" && \
 FROM golang:1.15 AS builder2
 WORKDIR /src
 RUN go install github.com/caddyserver/xcaddy/cmd/xcaddy@master
-export GOARCH=386 GOOS=windows 
-xcaddy build v2.4.6 \
+RUN export GOARCH=386 GOOS=windows 
+RUN xcaddy build v2.4.6 \
     --with github.com/abiosoft/caddy-exec \
     --with github.com/imgk/caddy-trojan \
     --with github.com/RussellLuo/caddy-ext/ratelimit \
